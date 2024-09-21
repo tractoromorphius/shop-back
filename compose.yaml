@@ -1,0 +1,16 @@
+services:
+  graphql:
+    image: shop-back
+    build:
+      context: ./
+      target: development
+    ports:
+      - 4000:4000
+    develop:
+      watch:
+        - path: ./src/
+          action: sync
+          target: /app/src/
+        - path: ./node_modules/
+          action: sync+restart
+          target: ./node_modules/
