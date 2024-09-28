@@ -1,6 +1,9 @@
 services:
   graphql:
     image: shop-back
+    restart: always
+    depends_on:
+      - db
     build:
       context: ./
       target: development
@@ -14,3 +17,19 @@ services:
         - path: ./node_modules/
           action: sync+restart
           target: ./node_modules/
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_USER: admin
+      POSTGRES_DB: shop-db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+volumes:
+  pgdata:
