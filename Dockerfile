@@ -10,6 +10,7 @@ FROM node:lts-alpine as development
 WORKDIR /app
 COPY *.json ./
 COPY --from=build /app/src ./src
+COPY --from=build /app/prisma ./prisma
 RUN npm ci
 
 EXPOSE 4000
