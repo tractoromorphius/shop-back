@@ -13,9 +13,12 @@
   "type": "module",
   "dependencies": {
     "@apollo/server": "^4.11.0",
+    "@prisma/client": "^5.20.0",
+    "@types/pg": "^8.11.10",
     "graphql": "^16.9.0",
     "graphql-config": "^5.1.2",
-    "graphql-tag": "^2.12.6"
+    "graphql-tag": "^2.12.6",
+    "prisma": "^5.20.0"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
