@@ -1,6 +1,4 @@
 import { resolvers } from './resolvers';
-import { startStandaloneServer, StartStandaloneServerOptions } from '@apollo/server/standalone';
-
 import { PrismaClient } from '@prisma/client';
 import { readFileSync } from 'fs';
 import { ApolloServer } from '@apollo/server';
