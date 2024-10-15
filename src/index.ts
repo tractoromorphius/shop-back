@@ -1,17 +1,20 @@
-import { ApolloServer } from '@apollo/server';
 import { resolvers } from './resolvers';
 import { startStandaloneServer, StartStandaloneServerOptions } from '@apollo/server/standalone';
+
 import { PrismaClient } from '@prisma/client';
 import { readFileSync } from 'fs';
+import { ApolloServer } from '@apollo/server';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { expressMiddleware } from '@apollo/server/express4';
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
 import gql from 'graphql-tag';
-import { ListenOptions } from 'net';
 import path from 'path';
 import { GraphqlContext } from './context';
 
-type ListenConfig = {
-  listen?: ListenOptions
-}
-
+const app = express();
+const httpServer = http.createServer(app);
 const typeDefs = gql(
   readFileSync(path.resolve(import.meta.dirname, "./schemes/schema.graphql"), {
     encoding: "utf8",
@@ -20,14 +23,22 @@ const typeDefs = gql(
 const server = new ApolloServer<GraphqlContext>({
   typeDefs,
   resolvers,
+  plugins: [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+  ]
 });
 
-const { url } = await startStandaloneServer(server, {
-  context: async () => ({ prismaOrm: new PrismaClient() }),
-  listen: {
-    port: 4000, 
-    host: "0.0.0.0",
-  },
-});
+await server.start();
 
-console.log(`Server ready at: ${url}`);
+app.use(
+  '/',
+  cors<cors.CorsRequest>(),
+  express.json({ limit: '50mb' }),
+  expressMiddleware(server, {
+    context: async () => ({ prismaOrm: new PrismaClient() }),
+  }),
+);
+
+await new Promise<void>((resolve) => {
+  return httpServer.listen({ port: 4000, host: "0.0.0.0" }, resolve)
+});
